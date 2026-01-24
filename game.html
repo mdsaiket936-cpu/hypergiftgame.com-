@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Touch Game 🎮</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+    --pink:#ff2a6d;
+    --gold:#ffd700;
+}
+
+body{
+    margin:0;
+    background:radial-gradient(circle,#240024,#000);
+    height:100vh;
+    overflow:hidden;
+    font-family:'Comic Sans MS', cursive;
+    color:var(--gold);
+}
+
+/* UI */
+.game-ui{
+    position:absolute;
+    top:15px;
+    width:100%;
+    text-align:center;
+    font-size:1.4rem;
+    z-index:10;
+}
+
+#status{
+    margin-top:6px;
+    font-size:1.2rem;
+}
+
+/* Birthday Text */
+#birthday{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%) scale(0);
+    font-size:2.6rem;
+    opacity:0;
+    pointer-events:none;
+    text-shadow:0 0 25px var(--pink);
+    z-index:5;
+}
+
+.open-text{
+    animation:popOut 1.1s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes popOut{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(0.2);
+    }
+    60%{
+        opacity:1;
+        transform:translate(-50%,-240px) scale(1.4);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,-220px) scale(1.2);
+    }
+}
+
+/* Gift Box */
+.gift-box{
+    width:160px;
+    height:120px;
+    background:linear-gradient(135deg,#ff2a6d,#b30047);
+    border-radius:14px;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    cursor:pointer;
+    box-shadow:0 0 30px #ff2a6d;
+    transition:0.25s;
+    z-index:10;
+}
+
+.lid{
+    position:absolute;
+    top:-26px;
+    left:-5px;
+    width:170px;
+    height:28px;
+    background:#ff4f8b;
+    border-radius:6px;
+    transition:0.7s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+.ribbon-v{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    width:26px;
+    height:100%;
+    background:linear-gradient(#ffd700,#b8860b,#ffd700);
+}
+
+.ribbon-h{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:100%;
+    height:10px;
+    background:linear-gradient(#ffd700,#b8860b,#ffd700);
+}
+
+.open .lid{
+    transform:translateY(-180px) rotate(20deg);
+    opacity:0;
+}
+
+/* Reset Button (UNDER box) */
+#reset{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, 120px);
+    background:none;
+    border:none;
+    color:var(--gold);
+    font-size:1.9rem;
+    cursor:pointer;
+    display:none;
+    text-shadow:0 0 10px var(--pink);
+    z-index:20;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-ui">
+    Touches: <span id="count">0</span> / 100
+    <div id="status">Catch the box 😜</div>
+</div>
+
+<div id="birthday">🎉 Happy Birthday Chadni! 🎂😂</div>
+
+<div class="gift-box" id="box">
+    <div class="ribbon-v"></div>
+    <div class="lid">
+        <div class="ribbon-v"></div>
+        <div class="ribbon-h"></div>
+    </div>
+</div>
+
+<button id="reset" onclick="resetGame()">
+    <i class="fas fa-rotate-left"></i>
+</button>
+
+<script>
+const box = document.getElementById("box");
+const countText = document.getElementById("count");
+const status = document.getElementById("status");
+const birthday = document.getElementById("birthday");
+const resetBtn = document.getElementById("reset");
+
+let touches = 0;
+const MAX_TOUCH = 100;
+
+const directions = [
+    {x: 0, y: -180},
+    {x: 0, y: 180},
+    {x: -240, y: 0},
+    {x: 240, y: 0}
+];
+
+box.addEventListener("click", moveBox);
+box.addEventListener("touchstart", moveBox);
+
+function moveBox(){
+    if(touches >= MAX_TOUCH) return;
+
+    touches++;
+    countText.innerText = touches;
+
+    const d = directions[Math.floor(Math.random()*directions.length)];
+    box.style.transform =
+        `translate(calc(-50% + ${d.x}px), calc(-50% + ${d.y}px))`;
+
+    box.style.background =
+        `linear-gradient(135deg,
+        hsl(${Math.random()*360},90%,60%),
+        hsl(${Math.random()*360},90%,40%))`;
+
+    status.innerText = `Keep going 😆 (${touches}/100)`;
+
+    if(touches === MAX_TOUCH){
+        openGift();
+    }
+}
+
+function openGift(){
+    status.innerText = "🎉 You did it!";
+    box.classList.add("open");
+    birthday.classList.add("open-text");
+
+    box.style.transform = "translate(-50%,-50%)";
+    resetBtn.style.display = "block";
+}
+
+function resetGame(){
+    touches = 0;
+    countText.innerText = 0;
+    status.innerText = "Catch the box 😜";
+
+    box.classList.remove("open");
+    birthday.classList.remove("open-text");
+
+    box.style.transform = "translate(-50%,-50%)";
+    resetBtn.style.display = "none";
+}
+</script>
+
+</body>
+</html>
