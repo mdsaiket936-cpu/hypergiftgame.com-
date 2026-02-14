@@ -1,112 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Birthday Touch Game 🎮</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine's Event</title>
 
 <style>
-:root{
-    --pink:#ff2a6d;
-    --gold:#ffd700;
-}
-
 body{
-    margin:0;
-    background:radial-gradient(circle,#240024,#000);
-    height:100vh;
-    overflow:hidden;
-    font-family:'Comic Sans MS', cursive;
-    color:var(--gold);
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family: Arial, sans-serif;
+  overflow:hidden;
+  background: linear-gradient(180deg,#e44fb7,#f06aa8,#7aa7ff);
 }
 
-/* UI */
-.game-ui{
-    position:absolute;
-    top:15px;
-    width:100%;
-    text-align:center;
-    font-size:1.4rem;
-    z-index:10;
+/* Valentine Panel */
+.panel{
+  width:90%;
+  max-width:400px;
+  padding:40px 20px;
+  text-align:center;
+  border-radius:20px;
+  background: linear-gradient(180deg,#ff4fa8,#ff79c6);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  position:relative;
+  overflow:hidden;
+  color:white;
 }
 
-#status{
-    margin-top:6px;
-    font-size:1.2rem;
+.title{
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:25px;
 }
 
-/* Birthday Text */
-#birthday{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%) scale(0);
-    font-size:2.6rem;
-    opacity:0;
-    pointer-events:none;
-    text-shadow:0 0 25px var(--pink);
-    z-index:5;
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  margin:10px;
+  transition:0.3s ease;
 }
 
-.open-text{
-    animation:popOut 1.1s cubic-bezier(.34,1.56,.64,1) forwards;
+.yes{
+  background:white;
+  color:#e44fb7;
 }
 
-@keyframes popOut{
-    0%{
-        opacity:0;
-        transform:translate(-50%,-50%) scale(0.2);
-    }
-    60%{
-        opacity:1;
-        transform:translate(-50%,-240px) scale(1.4);
-    }
-    100%{
-        opacity:1;
-        transform:translate(-50%,-220px) scale(1.2);
-    }
+.no{
+  background:white;
+  color:#555;
+  position:absolute;
 }
 
-/* Gift Box */
-.gift-box{
-    width:160px;
-    height:120px;
-    background:linear-gradient(135deg,#ff2a6d,#b30047);
-    border-radius:14px;
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    cursor:pointer;
-    box-shadow:0 0 30px #ff2a6d;
-    transition:0.25s;
-    z-index:10;
+/* Floating hearts */
+.heart{
+  position:absolute;
+  font-size:18px;
+  animation: floatUp 3s linear forwards;
+  pointer-events:none;
 }
 
-.lid{
-    position:absolute;
-    top:-26px;
-    left:-5px;
-    width:170px;
-    height:28px;
-    background:#ff4f8b;
-    border-radius:6px;
-    transition:0.7s cubic-bezier(.68,-0.55,.27,1.55);
+@keyframes floatUp{
+  from{ transform: translateY(0) scale(1); opacity:1; }
+  to{ transform: translateY(-400px) scale(1.5); opacity:0; }
 }
 
-.ribbon-v{
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    width:26px;
-    height:100%;
-    background:linear-gradient(#ffd700,#b8860b,#ffd700);
+.message{
+  margin-top:20px;
+  font-size:18px;
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="panel" id="panel">
+  <div class="title">Will you be my Valentine? 💖</div>
+
+  <button class="yes" id="yesBtn">Yes</button>
+  <button class="no" id="noBtn">No</button>
+
+  <div class="message" id="message">Yay!! I knew it 💕💘</div>
+</div>
+
+<script>
+const panel = document.getElementById("panel");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const message = document.getElementById("message");
+
+/* Create Heart */
+function createHeart(x,y,size=18){
+  const heart = document.createElement("div");
+  heart.className="heart";
+  heart.innerHTML="💖";
+  heart.style.left = x + "px";
+  heart.style.top = y + "px";
+  heart.style.fontSize = size + "px";
+  panel.appendChild(heart);
+  setTimeout(()=>heart.remove(),3000);
 }
 
-.ribbon-h{
-    position:absolute;
-    top:50%;
+/* Heart burst */
+function heartBurst(x,y,count,size){
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      createHeart(
+        x + (Math.random()*60 - 30),
+        y + (Math.random()*40 - 20),
+        size
+      );
+    }, i*80);
+  }
+}
+
+/* Move No button */
+function moveNo(){
+  const maxX = panel.clientWidth - noBtn.offsetWidth;
+  const maxY = panel.clientHeight - noBtn.offsetHeight;
+  const newX = Math.random() * maxX;
+  const newY = Math.random() * maxY;
+  noBtn.style.left = newX + "px";
+  noBtn.style.top = newY + "px";
+
+  heartBurst(newX,newY,8,16);
+}
+
+noBtn.addEventListener("mouseenter", moveNo);
+noBtn.addEventListener("click", moveNo);
+noBtn.addEventListener("touchstart", moveNo);
+
+/* YES BUTTON */
+yesBtn.addEventListener("click", (e)=>{
+  message.style.display = "block";
+
+  const rect = yesBtn.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+
+  const x = rect.left - panelRect.left + rect.width/2;
+  const y = rect.top - panelRect.top;
+
+  heartBurst(x,y,25,24); // big explosion
+
+  // ✨ Remove No button smoothly
+  noBtn.style.opacity = "0";
+  noBtn.style.transform = "scale(0)";
+  setTimeout(()=> noBtn.remove(), 300);
+});
+</script>
+
+</body>
+</html>    top:50%;
     transform:translateY(-50%);
     width:100%;
     height:10px;
@@ -223,3 +274,4 @@ function resetGame(){
 
 </body>
 </html>
+
